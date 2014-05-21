@@ -63,8 +63,6 @@ namespace HL7v23Store
                                 await StoreHL7(db, xDoc, hl7, Path.GetFileName(path));
 
                                 db.CompleteTransaction();
-
-                                File.Delete(path);
                             }
                             catch (Exception ex)
                             {
@@ -73,6 +71,8 @@ namespace HL7v23Store
                                 throw;
                             }
                         }
+
+                        File.Delete(path);
                     }
                 }
             };
