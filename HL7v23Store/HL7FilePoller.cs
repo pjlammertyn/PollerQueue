@@ -40,8 +40,8 @@ namespace HL7v23Store
                 log.Error(message, ex);
         }
 
-        protected override async Task<bool> ProcessFile(string path)
-        {
+        protected override async Task<bool> ProcessCurrentItem(string path)
+        { 
             Func<Task> action = async () =>
             {
                 if (!File.Exists(path))

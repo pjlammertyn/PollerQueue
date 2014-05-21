@@ -42,22 +42,6 @@ namespace Poller
                 BlockingCollection.Add(file);
         }
 
-        protected override async Task<bool> ProcessCurrentItem(string nextItem)
-        {
-            var normalizedPath = nextItem.Replace("/", "\\").ToLower();
-
-            if (!File.Exists(normalizedPath))
-                return true;
-
-            return await ProcessFile(normalizedPath);
-        }
-
-        #endregion
-
-        #region Abstract methods
-
-        protected abstract Task<bool> ProcessFile(string path);
-
         #endregion
     }
 }
