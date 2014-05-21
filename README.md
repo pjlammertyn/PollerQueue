@@ -1,4 +1,4 @@
 PollerQueue
 ===========
 
-A queue that pols for stuff to process.
+A queue that polls for stuff to process.
