@@ -73,10 +73,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\FilePoller\FilePoller.csproj">
-      <Project>{e8b8fce8-cc76-435b-8916-838fb4a8324f}</Project>
-      <Name>FilePoller</Name>
-    </ProjectReference>
     <ProjectReference Include="..\PollerQueue\PollerQueue.csproj">
       <Project>{cebc8364-66c1-4f49-9785-95a19b3dbcaa}</Project>
       <Name>PollerQueue</Name>
