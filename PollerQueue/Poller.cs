@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Threading.Tasks;
 using System.Timers;
 
 namespace Poller
@@ -19,6 +20,7 @@ namespace Poller
         {
             PollingInterval = 5000;
             PollOnStart = true;
+            OnlyPollOnEmptyQueue = true;
         }
 
         #endregion
@@ -27,12 +29,13 @@ namespace Poller
 
         public double PollingInterval { get; set; }
         public bool PollOnStart { get; set; }
+        public bool OnlyPollOnEmptyQueue { get; set; }
 
         #endregion
 
         #region Abstract Methods
 
-        protected abstract void Poll();
+        protected abstract Task Poll();
 
         #endregion
 
@@ -64,16 +67,16 @@ namespace Poller
 
         #region Events
 
-        void pollerTimer_Elapsed(object sender, ElapsedEventArgs e)
+        async void pollerTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            if (!Started || BlockingCollection.Count > 0)
+            if (!Started || (OnlyPollOnEmptyQueue && BlockingCollection.Count > 0))
                 return;
 
                 //pollerTimer.Enabled = false;
 
                 try
                 {
-                    Poll();
+                    await Poll();
                 }
                 catch (Exception ex)
                 {

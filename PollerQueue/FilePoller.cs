@@ -36,10 +36,13 @@ namespace Poller
 
         #region Poller implementation
 
-        protected override void Poll()
+        protected override async Task Poll()
         {
-            foreach (var file in Directory.EnumerateFiles(PollerPath, SearchPattern, SearchOption))
-                BlockingCollection.Add(file);
+            await Task.Run(() =>
+            {
+                foreach (var file in Directory.EnumerateFiles(PollerPath, SearchPattern, SearchOption))
+                    BlockingCollection.Add(file);
+            });
         }
 
         #endregion
