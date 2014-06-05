@@ -11,6 +11,7 @@ namespace Poller
         #region Variables
 
         Timer pollerTimer;
+        bool isPolling;
 
         #endregion
 
@@ -69,13 +70,13 @@ namespace Poller
 
         async void pollerTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            if (!Started || (OnlyPollOnEmptyQueue && BlockingCollection.Count > 0))
+            if (!Started || (OnlyPollOnEmptyQueue && BlockingCollection.Count > 0) || isPolling)
                 return;
-
-                //pollerTimer.Enabled = false;
 
                 try
                 {
+                    //pollerTimer.Enabled = false;
+                    isPolling = true;
                     await Poll();
                 }
                 catch (Exception ex)
@@ -85,6 +86,7 @@ namespace Poller
                 finally
                 {
                     //pollerTimer.Enabled = true;
+                    isPolling = false;
                 }
         }
 
