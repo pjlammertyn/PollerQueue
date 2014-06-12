@@ -65,13 +65,18 @@ namespace Poller
             {
                 Task.Run(async () =>
                 {
-                    foreach (var item in BlockingCollection.GetConsumingEnumerable(token.Token))
+                    try
                     {
-                        if (!Started)
-                            return;
+                        foreach (var item in BlockingCollection.GetConsumingEnumerable(token.Token))
+                        {
+                            if (!Started)
+                                return;
 
-                        await DoCurrentItem(item);
+                            await DoCurrentItem(item);
+                        }
                     }
+                    catch (OperationCanceledException)
+                    {}
                 }, token.Token);
             }
         }
