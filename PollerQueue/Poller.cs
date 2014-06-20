@@ -57,6 +57,7 @@ namespace Poller
         {
             if (pollerTimer != null)
             {
+                pollerTimer.Elapsed -= new ElapsedEventHandler(pollerTimer_Elapsed);
                 if (pollerTimer.Enabled)
                     pollerTimer.Stop();
                 pollerTimer.Dispose();
