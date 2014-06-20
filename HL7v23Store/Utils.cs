@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.ExceptionServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -25,31 +26,29 @@ namespace HL7v23Store
                 throw new ArgumentNullException("action");
 
             for (int i = 0; i < retryCount; i++)
-            {
+            {   
+                ExceptionDispatchInfo capturedException = null;
                 try
                 {
                     await Task.Run(action);
-                    //await action();
                     return;
                 }
                 catch (IOException ioe)
                 {
-                    if ((IsSharingViolation(ioe)) && (i < (retryCount - 1)))
+                    capturedException = ExceptionDispatchInfo.Capture(ioe);
+                }
+                if (capturedException != null)
+                {
+                    if ((IsSharingViolation(capturedException.SourceException as IOException)) && (i < (retryCount - 1)))
                     {
-                        bool wait = true;
+                        var wait = true;
                         if (exceptionsCallback != null)
-                        {
-                            wait = exceptionsCallback(ioe, i, retryCount, waitTime);
-                        }
+                            wait = exceptionsCallback(capturedException.SourceException as IOException, i, retryCount, waitTime);
                         if (wait)
-                        {
-                            Thread.Sleep(waitTime);
-                        }
+                            await Task.Delay(waitTime);
                     }
                     else
-                    {
-                        throw;
-                    }
+                        capturedException.Throw();
                 }
             }
         }
