@@ -30,7 +30,7 @@ namespace HL7v23Store
                 ExceptionDispatchInfo capturedException = null;
                 try
                 {
-                    await Task.Run(action);
+                    await Task.Run(action).ConfigureAwait(false);
                     return;
                 }
                 catch (IOException ioe)

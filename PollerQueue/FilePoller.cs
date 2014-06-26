@@ -42,7 +42,7 @@ namespace Poller
             {
                 foreach (var file in Directory.EnumerateFiles(PollerPath, SearchPattern, SearchOption))
                     BlockingCollection.Add(file);
-            });
+            }).ConfigureAwait(false);
         }
 
         #endregion

@@ -77,7 +77,7 @@ namespace Poller
                     }
                     catch (OperationCanceledException)
                     {}
-                }, token.Token);
+                }, token.Token).ConfigureAwait(false);
             }
         }
 
