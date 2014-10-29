@@ -46,7 +46,7 @@
     <Compile Include="QueueProcessor.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="PollerQueue.0.0.5.nupkg" />
+    <None Include="PollerQueue.0.0.6.nupkg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

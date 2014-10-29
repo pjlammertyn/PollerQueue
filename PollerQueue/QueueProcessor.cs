@@ -24,7 +24,7 @@ namespace Poller
             QueueProcessingInterval = 1000;
             MaxDegreeOfParallelism = System.Environment.ProcessorCount;
             MaxExceptionCountForCurrentItem = 5;
-            MaxExponentialSleepTimeoutWhenExceptionForCurrentItem = 5 * 60000; //5min
+            StartDelayInMillisecondsWhenExceptionForCurrentItem = 2000; //2sec
         }
 
         #endregion
@@ -34,7 +34,7 @@ namespace Poller
         public int MaxDegreeOfParallelism { get; set; }
         public int QueueProcessingInterval { get; set; }
         public int MaxExceptionCountForCurrentItem { get; set; }
-        public int MaxExponentialSleepTimeoutWhenExceptionForCurrentItem { get; set; }
+        public int StartDelayInMillisecondsWhenExceptionForCurrentItem { get; set; }
         protected BlockingCollection<T> BlockingCollection { get; private set; }
         protected bool Started { get; private set; }
 
@@ -45,7 +45,7 @@ namespace Poller
         protected abstract void OnStart();
         protected abstract void OnStop();
         protected abstract Task<bool> ProcessCurrentItem(T currentItem);
-        protected abstract void LogException(string message, Exception ex);
+        protected abstract void LogException(string message, Exception ex, T currentItem);
 
         #endregion
 
@@ -95,7 +95,7 @@ namespace Poller
         {
             var exceptionCountForCurrentItem = 0;
             var success = false;
-            var exponentialSleepTimeout = 2000;
+            var millisecondsDelay = StartDelayInMillisecondsWhenExceptionForCurrentItem;
 
             while (!success)
             {
@@ -108,22 +108,16 @@ namespace Poller
                     exceptionCountForCurrentItem++;
                     if (exceptionCountForCurrentItem > MaxExceptionCountForCurrentItem)
                     {
-                        LogException("Cannot process current item", ex);
+                        LogException(string.Format("Cannot process current item after {0} retries.", MaxExceptionCountForCurrentItem), ex, currentItem);
                         success = true;
                     }
                 }
 
                 if (!success)
                 {
-                    await Task.Delay(exponentialSleepTimeout);
+                    await Task.Delay(millisecondsDelay);
 
-                    if (exponentialSleepTimeout >= MaxExponentialSleepTimeoutWhenExceptionForCurrentItem) 
-                    {
-                        var message = string.Format("PollerQueue exponentialy failed for {0} minutes!", (int)(exponentialSleepTimeout / 60000));
-                        LogException(message, new Exception(message));
-                    }
-                    else
-                        exponentialSleepTimeout *= 2; 
+                    millisecondsDelay *= 2; 
                 }
             }
         }

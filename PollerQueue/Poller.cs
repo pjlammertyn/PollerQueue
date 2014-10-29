@@ -82,7 +82,7 @@ namespace Poller
                 }
                 catch (Exception ex)
                 {
-                    LogException("Polling failed", ex);
+                    LogException("Polling failed", ex, default(T));
                 }
                 finally
                 {

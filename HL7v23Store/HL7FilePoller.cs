@@ -34,20 +34,23 @@ namespace HL7v23Store
 
         #region FilePoller implementation
 
-        protected override void LogException(string message, Exception ex)
+        protected override void LogException(string message, Exception ex, string currentItem)
         {
             if (log.IsErrorEnabled)
                 log.Error(message, ex);
+
+            if (!string.IsNullOrEmpty(currentItem) && File.Exists(currentItem))
+                File.Delete(currentItem);
         }
 
-        protected override async Task<bool> ProcessCurrentItem(string path)
+        protected override async Task<bool> ProcessCurrentItem(string currentItem)
         { 
             Func<Task> action = async () =>
             {
-                if (!File.Exists(path))
+                if (!File.Exists(currentItem))
                     return;
 
-                using (var fs = new FileStream(path, FileMode.Open, FileAccess.ReadWrite, FileShare.Delete))
+                using (var fs = new FileStream(currentItem, FileMode.Open, FileAccess.ReadWrite, FileShare.Delete))
                 {
                     using (var sr = new StreamReader(fs, Encoding.GetEncoding("iso-8859-1"))) //latin1
                     {
@@ -60,19 +63,18 @@ namespace HL7v23Store
                             {
                                 await db.BeginTransactionAsync();
 
-                                await StoreHL7(db, xDoc, hl7, Path.GetFileName(path));
+                                await StoreHL7(db, xDoc, hl7, Path.GetFileName(currentItem));
 
                                 db.CompleteTransaction();
                             }
-                            catch (Exception ex)
+                            catch (Exception)
                             {
-                                LogException("Cannot insert into database", ex);
                                 db.AbortTransaction();
                                 throw;
                             }
                         }
 
-                        File.Delete(path);
+                        File.Delete(currentItem);
                     }
                 }
             };
@@ -117,7 +119,7 @@ namespace HL7v23Store
             else
             {
                 var message = string.Format("Need to store unsupported Message with MessageType {0}: {1}", record.MessageType, hl7);
-                LogException(message, new Exception(message));   
+                LogException(message, new Exception(message), null);   
             }
 
             await db.ExecuteAsync(@"update ZISv21.dbo.LastProcessedMessage
