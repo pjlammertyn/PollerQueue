@@ -2,7 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 
-namespace Poller
+namespace PollerQueue
 {
     public abstract class FilePoller : Poller<string>
     {

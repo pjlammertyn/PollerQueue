@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 
-namespace Poller
+namespace PollerQueue
 {
     public abstract class QueueProcessor<T>
          where T : class

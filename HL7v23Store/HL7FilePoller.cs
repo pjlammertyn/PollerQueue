@@ -2,7 +2,7 @@
 using HL7toXDocumentParser;
 using HL7v23Store.Model;
 using log4net;
-using Poller;
+using PollerQueue;
 using System;
 using System.Collections.Generic;
 using System.Configuration;

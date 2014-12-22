@@ -3,7 +3,7 @@ using System.Collections;
 using System.Threading.Tasks;
 using System.Timers;
 
-namespace Poller
+namespace PollerQueue
 {
     public abstract class Poller<T> : QueueProcessor<T>
         where T : class
