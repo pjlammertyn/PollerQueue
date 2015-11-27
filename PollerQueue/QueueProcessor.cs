@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Timers;
 
 namespace PollerQueue
 {
@@ -22,9 +20,10 @@ namespace PollerQueue
         {
             BlockingCollection = new BlockingCollection<T>();
             QueueProcessingInterval = 1000;
-            MaxDegreeOfParallelism = System.Environment.ProcessorCount;
+            MaxDegreeOfParallelism = Environment.ProcessorCount;
             MaxExceptionCountForCurrentItem = 5;
             StartDelayInMillisecondsWhenExceptionForCurrentItem = 2000; //2sec
+            WaitForQueueToBeEmptyBeforeStop = false;
         }
 
         #endregion
@@ -37,6 +36,7 @@ namespace PollerQueue
         public int StartDelayInMillisecondsWhenExceptionForCurrentItem { get; set; }
         protected BlockingCollection<T> BlockingCollection { get; private set; }
         protected bool Started { get; private set; }
+        public bool WaitForQueueToBeEmptyBeforeStop { get; set; }
 
         #endregion
 
@@ -69,7 +69,7 @@ namespace PollerQueue
                     {
                         foreach (var item in BlockingCollection.GetConsumingEnumerable(token.Token))
                         {
-                            if (!Started)
+                            if (!WaitForQueueToBeEmptyBeforeStop && !Started)
                                 return;
 
                             await DoCurrentItem(item);
@@ -85,7 +85,7 @@ namespace PollerQueue
         {
             Started = false;
 
-            if (token != null)
+            if (WaitForQueueToBeEmptyBeforeStop && token != null)
                 token.Cancel();
 
             OnStop();        
